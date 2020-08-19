@@ -13,27 +13,21 @@ Adafruit_SSD1306 oled(ANCHO, ALTO, &Wire, OLED_RESET); //Crea objeto de la panta
 #include <mlx90615.h>
 MLX90615 mlx = MLX90615(); //Crea objeto del sensor de temperatura médico
 
-int led_verde = 12;                  //Pin de conección al arduino del led verde
-int led_rojo = 11;                   //Pin de conección al arduino del led rojo
-int led_amarillo, nebulizacion = 10; //Pin de conección al arduino del led amarillo
-int ventiladores = 8;                //Pin de conección al arduino de ventiladores de circulación de neblina
-int sensor_linea = 5;                //Pin de conección al arduino del sensor de linea
-int buzzer = 4;                      //Pin de conección al arduino del buzzer
-int sensor_presencia = 3;            //Pin de conección al arduino del sensor de presencia
-int sensor_alcohol = A0;             //Pin de conección al arduino del sensor de alcohol
+int led_verde = 12;       //Pin de conección al arduino del led verde
+int led_rojo = 11;        //Pin de conección al arduino del led rojo
+int led_amarillo = 10;    //Pin de conección al arduino del led amarillo
+int nebulizador = 9;     //Pin de conección al arduino del nebulizador
+int ventiladores = 8;     //Pin de conección al arduino de ventiladores de circulación de neblina
+int buzzer = 4;           //Pin de conección al arduino del buzzer
+int sensor_presencia = 3; //Pin de conección al arduino del sensor de presencia
+int sensor_alcohol = A1;  //Pin de conección al arduino del sensor de alcohol
 
 // int neblina_maxima = 400;    //Tope de neblina en la cabina de sanitización
 // int neblina_minima = 300;    //Minimo de neblino que se quiere tener en la cabina
 int buzzer_tiempo = 10;      //Tiempo que durará el buzzer encendido
 int usuario_detectado;       //Variable para almacenar el valor del sensor de presencia
 int valor_alcohol;           //Variable para almacenar el valor del sensor de alcohol
-int tempus;                  //Definir mejor, cambiada por "temperatura_leida" no era necesaria
-bool finalizado = false;     //Definir mejor
-bool cambio = false;         //Definir mejor
-bool verifica = false;       //Definir mejor
-bool activa = false;         //Definir mejor
-bool persona_activa = false; //Definir mejor
-float temperatura_leida;
+float temperatura_leida;  
 String temperatura_mostrada;
 char temperatura_enviada[6];
 
@@ -50,12 +44,11 @@ void setup()
     pinMode(led_rojo, OUTPUT);
     pinMode(led_verde, OUTPUT);
     pinMode(led_amarillo, OUTPUT);
-    pinMode(nebulizacion, OUTPUT);
+    pinMode(nebulizador, OUTPUT);
     pinMode(ventiladores, OUTPUT);
     pinMode(buzzer, OUTPUT);
 
     pinMode(sensor_alcohol, INPUT);
-    pinMode(sensor_linea, INPUT);
     pinMode(sensor_presencia, INPUT);
 }
 
@@ -64,7 +57,7 @@ void loop()
     nebulizacionConstante(400); //Se declara el valor estandar al que se va a encender el nebulizador
     usuario_detectado = digitalRead(sensor_presencia);
 
-    if (usuario_detectado == 1)
+    if (usuario_detectado == 1) //No hay nadie frente al sensor
     {
         usuario_detectado = digitalRead(sensor_presencia); // Verifica que una persona vaya a tomar temperatura
         oled.clearDisplay();                               // limpia pantalla
@@ -74,7 +67,7 @@ void loop()
         oled.print("Coloque su\nfrente");
         oled.display();
     }
-    else if (usuario_detectado == 0 && temperatura_leida == 0)
+    else if (usuario_detectado == 0 && temperatura_leida == 0) //Hay alguien en el sensor
     {
 
         oled.clearDisplay();      // limpia pantalla
@@ -120,7 +113,7 @@ void loop()
             digitalWrite(led_rojo, LOW);
             temperatura_leida = 0;
         }
-        else if (temperatura_leida < 37 && temperatura_leida != 0) // Sin fiebre
+        else if (temperatura_leida < 37 && temperatura_leida != 0) //Sin fiebre
         {
             digitalWrite(led_verde, HIGH);
         }
@@ -142,10 +135,10 @@ void nebulizacionConstante(int neblina_estandar) //Funcion de estado general, ll
 
     if (valor_alcohol < neblina_estandar)
     {
-        digitalWrite(led_amarillo && nebulizacion, HIGH);
+        digitalWrite(led_amarillo && nebulizador, HIGH);
     }
     else
     {
-        digitalWrite(led_amarillo && nebulizacion, LOW);
+        digitalWrite(led_amarillo && nebulizador, LOW);
     }
 }
