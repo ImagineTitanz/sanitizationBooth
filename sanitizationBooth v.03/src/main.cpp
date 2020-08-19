@@ -74,7 +74,7 @@ void loop()
         oled.print("Coloque su\nfrente");
         oled.display();
     }
-    else if (usuario_detectado == 0 && persona_activa == false && temperatura_leida == 0)
+    else if (usuario_detectado == 0 && temperatura_leida == 0)
     {
 
         oled.clearDisplay();      // limpia pantalla
@@ -92,12 +92,12 @@ void loop()
         oled.print(".");
         oled.display();
         delay(1000);
-        oled.clearDisplay();                       // Limpia pantalla
-        oled.setCursor(0, 0);                      // Ubica cursor en inicio de coordenadas 0,0
-        temperatura_leida = mlx.get_object_temp(); //Guarda el valor de la temperatura leida por el sensor
-        // Revisar si esto afecta algo tempus = temperatura_leida;
+        oled.clearDisplay();                              // Limpia pantalla
+        oled.setCursor(0, 0);                             // Ubica cursor en inicio de coordenadas 0,0
+        temperatura_leida = mlx.get_object_temp();        //Guarda el valor de la temperatura leida por el sensor
         temperatura_mostrada = String(temperatura_leida); //Transforma a string y guarda el valor de la temperatura leida
         oled.print(temperatura_mostrada + "oC");          // Escribe en pantalla el texto
+
         int large = temperatura_mostrada.length();
         for (int i = 0; i < large; i++)
         {
@@ -105,39 +105,24 @@ void loop()
         }
         Serial.write(temperatura_enviada, 6);
         oled.display(); // Muestra en pantalla la temperatura del usuario en °C
-        //    datos = digitalRead(listo); Definir mejor si esto afecta o no, ya estaba comentado
-        cambio = false;
-        finalizado = false;
-    }
 
-    if (temperatura_leida >= 37 && temperatura_leida != 0)
-    { //Fiebre
-        digitalWrite(led_rojo, HIGH);
-        digitalWrite(led_verde, LOW);
-        for (int i = 0; i == buzzer_tiempo; i++)
+        if (temperatura_leida >= 37 && temperatura_leida != 0) //Fiebre
         {
-            digitalWrite(buzzer, !digitalRead(buzzer));
-            delay(buzzer_tiempo);
-        }
-        delay(5000);
-        digitalWrite(buzzer, LOW);
-        digitalWrite(led_rojo, LOW);
-        // subida = false;
-        persona_activa = false;
-        verifica = false;
-        temperatura_leida = 0;
-    }
-
-    if (temperatura_leida < 37 && temperatura_leida != 0)
-    { // Sin fiebre
-
-        if (cambio == true && finalizado == false)
-        {
-            persona_activa = false;
-            verifica = false;
-            activa = false;
-            finalizado = true;
+            digitalWrite(led_rojo, HIGH);
+            digitalWrite(led_verde, LOW);
+            for (int i = 0; i == buzzer_tiempo; i++)
+            {
+                digitalWrite(buzzer, !digitalRead(buzzer));
+                delay(buzzer_tiempo);
+            }
+            delay(5000);
+            digitalWrite(buzzer, LOW);
+            digitalWrite(led_rojo, LOW);
             temperatura_leida = 0;
+        }
+        else if (temperatura_leida < 37 && temperatura_leida != 0) // Sin fiebre
+        {
+            digitalWrite(led_verde, HIGH);
         }
     }
 }
