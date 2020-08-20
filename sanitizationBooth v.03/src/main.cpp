@@ -16,7 +16,7 @@ MLX90615 mlx = MLX90615(); //Crea objeto del sensor de temperatura médico
 int led_verde = 12;       //Pin de conección al arduino del led verde
 int led_rojo = 11;        //Pin de conección al arduino del led rojo
 int led_amarillo = 10;    //Pin de conección al arduino del led amarillo
-int nebulizador = 9;     //Pin de conección al arduino del nebulizador
+int nebulizador = 9;      //Pin de conección al arduino del nebulizador
 int ventiladores = 8;     //Pin de conección al arduino de ventiladores de circulación de neblina
 int buzzer = 4;           //Pin de conección al arduino del buzzer
 int sensor_presencia = 3; //Pin de conección al arduino del sensor de presencia
@@ -24,10 +24,10 @@ int sensor_alcohol = A1;  //Pin de conección al arduino del sensor de alcohol
 
 // int neblina_maxima = 400;    //Tope de neblina en la cabina de sanitización
 // int neblina_minima = 300;    //Minimo de neblino que se quiere tener en la cabina
-int buzzer_tiempo = 10;      //Tiempo que durará el buzzer encendido
-int usuario_detectado;       //Variable para almacenar el valor del sensor de presencia
-int valor_alcohol;           //Variable para almacenar el valor del sensor de alcohol
-float temperatura_leida;  
+int buzzer_tiempo = 10; //Tiempo que durará el buzzer encendido
+int usuario_detectado;  //Variable para almacenar el valor del sensor de presencia
+int valor_alcohol;      //Variable para almacenar el valor del sensor de alcohol
+float temperatura_leida;
 String temperatura_mostrada;
 char temperatura_enviada[6];
 
@@ -50,12 +50,16 @@ void setup()
 
     pinMode(sensor_alcohol, INPUT);
     pinMode(sensor_presencia, INPUT);
+    digitalWrite(led_rojo, LOW);
+    digitalWrite(led_verde, LOW);
+    digitalWrite(led_amarillo, LOW);
 }
 
 void loop()
 {
-    nebulizacionConstante(400); //Se declara el valor estandar al que se va a encender el nebulizador
-    usuario_detectado = digitalRead(sensor_presencia);
+
+    nebulizacionConstante(400);                        //Se declara el valor estandar al que se va a encender el nebulizador
+    usuario_detectado = digitalRead(sensor_presencia); //almacena el valor del sensor de presencia en usuario detectado
 
     if (usuario_detectado == 1) //No hay nadie frente al sensor
     {
@@ -89,7 +93,7 @@ void loop()
         oled.setCursor(0, 0);                             // Ubica cursor en inicio de coordenadas 0,0
         temperatura_leida = mlx.get_object_temp();        //Guarda el valor de la temperatura leida por el sensor
         temperatura_mostrada = String(temperatura_leida); //Transforma a string y guarda el valor de la temperatura leida
-        oled.print(temperatura_mostrada + "oC");          // Escribe en pantalla el texto
+        oled.print(temperatura_mostrada + "oC"); // Escribe en pantalla el texto
 
         int large = temperatura_mostrada.length();
         for (int i = 0; i < large; i++)
@@ -116,29 +120,29 @@ void loop()
         else if (temperatura_leida < 37 && temperatura_leida != 0) //Sin fiebre
         {
             digitalWrite(led_verde, HIGH);
+            delay(2000);
+            temperatura_leida = 0;
         }
     }
 }
 
 void nebulizacionConstante(int neblina_estandar) //Funcion de estado general, llena constantemente de sustancia el ambiente
 {
+    usuario_detectado = digitalRead(sensor_presencia); //almacena el valor del sensor de presencia en usuario detectado
     valor_alcohol = analogRead(sensor_alcohol);
+    delay(1000);
 
     if (valor_alcohol > neblina_estandar)
     {
         digitalWrite(led_verde, HIGH);
-    }
-    else
-    {
-        digitalWrite(led_verde, LOW);
+        digitalWrite(led_amarillo, LOW);
+        digitalWrite(nebulizador, LOW);
     }
 
-    if (valor_alcohol < neblina_estandar)
+    else if (valor_alcohol < neblina_estandar)
     {
-        digitalWrite(led_amarillo && nebulizador, HIGH);
-    }
-    else
-    {
-        digitalWrite(led_amarillo && nebulizador, LOW);
+        digitalWrite(led_verde, LOW);
+        digitalWrite(led_amarillo, HIGH);
+        digitalWrite(nebulizador, HIGH);
     }
 }
