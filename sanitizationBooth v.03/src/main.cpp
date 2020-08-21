@@ -1,6 +1,7 @@
 /* Mueblares Morelos
 */
 #include <Arduino.h>
+#include <Wire.h>
 
 #include <Adafruit_GFX.h>     //Librería para controla los Global Effects
 #include <Adafruit_SSD1306.h> //Librería para controlar la pantalla OLED SSD1306
@@ -93,7 +94,7 @@ void loop()
         oled.setCursor(0, 0);                             // Ubica cursor en inicio de coordenadas 0,0
         temperatura_leida = mlx.get_object_temp();        //Guarda el valor de la temperatura leida por el sensor
         temperatura_mostrada = String(temperatura_leida); //Transforma a string y guarda el valor de la temperatura leida
-        oled.print(temperatura_mostrada + "oC"); // Escribe en pantalla el texto
+        oled.print(temperatura_mostrada + "oC");          // Escribe en pantalla el texto
 
         int large = temperatura_mostrada.length();
         for (int i = 0; i < large; i++)
